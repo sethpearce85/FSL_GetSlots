@@ -6,14 +6,24 @@ public static ServiceAppointment getAppointmentDetails(String recordId){
         system.debug('record id----->'+recordId);
 
         return [
-                    SELECT Id, SchedStartTime, SchedEndTime, ServiceTerritoryId, ServiceTerritory.Name,
-                    ServiceTerritory.OperatingHoursId, Address, AppointmentNumber,
-                    Work_Order__r.WorkOrderNumber, Work_Order__r.WorkType.Name, Work_Order__r.Id, Work_Order__r.Service_Window_End_Date__c,
-                    Work_Order__r.Service_Window_Start_Date__c, Status
+                    SELECT 
+                        Id, 
+                        SchedStartTime,
+                        SchedEndTime, 
+                        ServiceTerritoryId, 
+                        ServiceTerritory.Name,
+                        ServiceTerritory.OperatingHoursId, 
+                        Address, 
+                        AppointmentNumber,
+                        Work_Order__r.WorkOrderNumber, 
+                        Work_Order__r.WorkType.Name, 
+                        Work_Order__r.Id, 
+                        Work_Order__r.Service_Window_End_Date__c,
+                        Work_Order__r.Service_Window_Start_Date__c, 
+                        Status
                     FROM ServiceAppointment
                     WHERE Work_Order__r.Id =: recordId
-                    LIMIT 1
-                    ];
+                    LIMIT 1];
           
         
     } catch (Exception e) {
@@ -40,10 +50,11 @@ public static String getSlots(String saId, String policy){
       
 
         List<FSL__Scheduling_Policy__c> fslSchedulePolicyLst = [
-            SELECT Id, Name
+            SELECT 
+                Id, 
+                Name
             FROM FSL__Scheduling_Policy__c
             WHERE Id = :fslSchedPolicyId
-
         ];
 
         if(fslSchedulePolicyLst.size() > 0){
@@ -53,11 +64,13 @@ public static String getSlots(String saId, String policy){
         }
 
         ServiceAppointment sa = [
-                                    SELECT Id, ServiceTerritory.OperatingHoursId
+                                    SELECT 
+                                        Id, 
+                                        ServiceTerritory.OperatingHoursId
                                     FROM ServiceAppointment
                                     WHERE Id =: saId
                                     LIMIT 1
-                            ];
+        ];
 
         
         
@@ -197,10 +210,6 @@ public static String submitServiceAppt(String saId, String startTime, String end
         DateTime finalConvertedEndTime = Datetime.newInstance(windowEnd.date(), windowEnd.time() - finalEndOffset);
         system.debug(finalConvertedEndTime);
 
-
-
-
-
         Id servApptId = saId;
 
         ServiceAppointment sa = new ServiceAppointment(
@@ -213,17 +222,12 @@ public static String submitServiceAppt(String saId, String startTime, String end
 
         TerminixCloudServiceApptReschedule.bookAppointment(fslSchedPolicyId, saId);
 
-      
-
-
         return 'Success';
 
     } catch (Exception e) {
         throw new AuraHandledException(e.getMessage());
     }
 }
-
-
 
 class SlotDateArray {
     List<SlotWrapper> slots = new List<SlotWrapper>();
@@ -246,7 +250,5 @@ class SlotWrapper{
         this.endhour = endTime.timeGMT();
     }
 }
-
-
 
 }
